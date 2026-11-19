@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocols ranked by implied value</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<a class="skip" href="#board">Skip to the board</a>
+<div class="shell">
+  <header class="top">
+    <div class="brand">
+      <svg class="mark" width="36" height="36" viewBox="0 0 36 36" role="img" aria-label="Radar mark">
+        <circle cx="18" cy="18" r="16" fill="none" stroke="#0d5c46" stroke-width="1.4"/>
+        <circle cx="18" cy="18" r="10.5" fill="none" stroke="#0d5c46" stroke-width="1" opacity="0.55"/>
+        <circle cx="18" cy="18" r="5" fill="none" stroke="#0d5c46" stroke-width="1" opacity="0.35"/>
+        <line x1="18" y1="18" x2="18" y2="2.5" stroke="#0d5c46" stroke-width="1.4"/>
+        <line x1="18" y1="18" x2="30" y2="26" stroke="#0d5c46" stroke-width="1" opacity="0.55"/>
+        <circle cx="25.5" cy="10.5" r="2.6" fill="#0d5c46"/>
+        <circle cx="18" cy="18" r="1.6" fill="#0d5c46"/>
+      </svg>
+      <div>
+        <div class="wordmark">Token Radar</div>
+        <div class="tagline">Pre-token protocols, ranked by implied value</div>
+      </div>
+    </div>
+    <div class="top-meta">
+      <span id="snapDate">Snapshot —</span>
+      <span>DefiLlama protocol index</span>
+      <span>radar-2 model</span>
+    </div>
+  </header>
+
+  <section class="lede">
+    <div>
+      <h1 id="ledeHead">Watchlist protocols, ranked by implied value</h1>
+      <p>The watchlist is the floor, never the ceiling: every protocol with at least <b id="floorUsd">$50M</b> of TVL that records no token. Below it the early radar adds <b id="earlyCount">—</b> pre-token protocols under that floor, ranked by the same model. Implied value is a model, not a promise: it says what a token would be worth if the protocol&rsquo;s record stayed as it is. It does not predict whether or when a token is issued, and a protocol here records no token — which is not proof that it has none.</p>
+    </div>
+    <dl class="facts">
+      <div class="fact"><dt>Watchlist covered</dt><dd id="factWatch">—</dd></div>
+      <div class="fact"><dt>Pre-token rows scored</dt><dd id="factBoard">—</dd></div>
+      <div class="fact"><dt>Early rows below the floor</dt><dd id="factEarly">—</dd></div>
+      <div class="fact"><dt>Live-token protocols set aside</dt><dd id="factLive">—</dd></div>
+    </dl>
+  </section>
+
+  <div class="controls" role="search">
+    <div class="field">
+      <label for="q">Search</label>
+      <input type="search" id="q" placeholder="Name, category or chain" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="category">Category</label>
+      <select id="category" aria-label="Filter by category"></select>
+    </div>
+    <div class="field">
+      <span class="field-label" id="tabLabel">Token status</span>
+      <div class="tabs" role="group" aria-labelledby="tabLabel">
+        <button type="button" id="tabPre" aria-pressed="true">Pre-token</button>
+        <button type="button" id="tabLive" aria-pressed="false">Live token</button>
+      </div>
+    </div>
+    <span class="count" id="count" aria-live="polite"></span>
+  </div>
+
+  <section id="prePanel" aria-label="Pre-token board">
+    <div class="panel" id="board">
+      <div class="table-wrap">
+        <table>
+          <caption>Pre-token protocols, strongest implied value first. Select a row for its model breakdown and farm plan.</caption>
+          <thead><tr>
+            <th scope="col"><button type="button" data-sort="implied">Rank <span class="arrow" data-arrow="implied"></span></button></th>
+            <th scope="col"><button type="button" data-sort="name">Protocol <span class="arrow" data-arrow="name"></span></button></th>
+            <th scope="col"><button type="button" data-sort="tvl">TVL <span class="arrow" data-arrow="tvl"></span></button></th>
+            <th scope="col"><button type="button" data-sort="growth">7d <span class="arrow" data-arrow="growth"></span></button></th>
+            <th scope="col"><button type="button" data-sort="age">Age <span class="arrow" data-arrow="age"></span></button></th>
+            <th scope="col"><button type="button" data-sort="implied">Implied value <span class="arrow" data-arrow="implied"></span></button></th>
+            <th scope="col">Token</th>
+          </tr></thead>
+          <tbody id="boardBody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="emptyState" hidden>
+        <h2>No protocol matches that filter</h2>
+        <p>Clear the search or pick another category to see the board again.</p>
+        <button class="button primary" type="button" id="clearFilters">Clear filters</button>
+      </div>
+    </div>
+
+    <section class="panel model" aria-labelledby="modelTitle">
+      <h2 id="modelTitle">How implied value is computed</h2>
+      <p class="formula" id="formula"></p>
+      <dl class="factors">
+        <div><dt>Base multiple</dt><dd>Each category carries its own multiple — the median market-cap-to-TVL ratio of live-token peers in that category. A category with too few peers falls back to the global median. The multiple is the category&rsquo;s, never a single protocol&rsquo;s.</dd></div>
+        <div><dt>Growth</dt><dd>Seven-day TVL change, clamped to the model&rsquo;s floor and cap, then weighted. Fast-growing TVL earns a higher multiple; shrinking TVL earns less.</dd></div>
+        <div><dt>Maturity</dt><dd>Time since the protocol was first listed — the best record of how long it has run with no token. Older protocols score closer to the full maturity factor; an unlisted age uses the model&rsquo;s fallback age.</dd></div>
+        <div><dt>Chains</dt><dd>Each extra chain beyond the first adds a small premium, capped, for protocols that have already spread across chains.</dd></div>
+      </dl>
+      <p class="note">Every row is scored by the same function of the snapshot figures. No protocol name is special-cased and no row is hand-picked. TVL, growth and age come from the snapshot alone; there is no hand-kept list of names.</p>
+      <p class="note"><strong>Conservatism note.</strong> The multiples use circulating market cap, not fully-diluted value, so they understate what a token would be worth on a fully-diluted basis. The board is deliberately low, not generous.</p>
+      <p class="note source" id="sourceLine"></p>
+    </section>
+  </section>
+
+  <section id="livePanel" aria-label="Live-token protocols" hidden>
+    <div class="panel">
+      <div class="table-wrap">
+        <table>
+          <caption>Token live: these protocols already trade, so their market cap is a fact, not a model. They are set aside from the pre-token ranking.</caption>
+          <thead><tr>
+            <th scope="col">Status</th><th scope="col">Protocol</th><th scope="col">TVL</th>
+            <th scope="col">7d</th><th scope="col">Market cap</th><th scope="col">Token</th>
+          </tr></thead>
+          <tbody id="liveBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <section class="panel model" aria-labelledby="calTitle">
+      <h2 id="calTitle">How the model is calibrated</h2>
+      <p class="note">Each category&rsquo;s base multiple is the median market-cap-to-TVL multiple of its live-token peers — protocols whose token already trades. Categories with too few peers use the global median instead, marked below. This is where the board visibly separates protocols whose token already trades from those still to come: the live set teaches the model, the pre-token set is scored by it.</p>
+      <div class="table-wrap">
+        <table class="cal">
+          <thead><tr><th scope="col">Category</th><th scope="col">Multiple</th><th scope="col">Live peers</th><th scope="col">Global fallback</th></tr></thead>
+          <tbody id="calBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+</div>
+
+<dialog class="detail" id="detail" aria-labelledby="detailTitle"></dialog>
+<script src="../data.js"></script>
+<script>history.replaceState(null, "", "#category=Dexs");</script>
+<script src="app.js"></script>
+</body>
+</html>
