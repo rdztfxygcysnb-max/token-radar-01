@@ -34,7 +34,7 @@
   // implied = round(tvl x baseMultiple x growthMult x maturityMult x chainMult)
   //   growthMult   = 1 + clamp(change_7d, growth_floor, growth_cap) / 100 x growth_weight
   //   maturityMult = maturity_floor + min(max(age,0), maturity_days) / maturity_days x maturity_range
-  //   chainMult    = 1 + min(max(chains-1, 0) x chain_per_extra, chain_cap)
+  //   chainMult    = min(1 + max(chains-1, 0) x chain_per_extra, chain_cap)
   // age unknown uses unknown_age_days; change_7d unreported counts as 0.
   function growthOf(r) {
     var g = clamp(r.change_7d === null || r.change_7d === undefined ? 0 : r.change_7d, M.growth_floor, M.growth_cap);
@@ -46,7 +46,7 @@
   }
   function chainOf(r) {
     var extra = Math.max(((r.chains || []).length - 1), 0);
-    return { extra: extra, mult: 1 + Math.min(extra * M.chain_per_extra, M.chain_cap) };
+    return { extra: extra, mult: Math.min(1 + extra * M.chain_per_extra, M.chain_cap) };
   }
   function impliedOf(r) {
     var g = growthOf(r).mult, m = maturityOf(r).mult, c = chainOf(r).mult;
@@ -342,7 +342,7 @@
     $('formula').innerHTML = '';
     $('formula').appendChild(document.createTextNode('implied = round( TVL × '));
     var b = document.createElement('b'); b.textContent = 'category multiple'; $('formula').appendChild(b);
-    $('formula').appendChild(document.createTextNode(' × (1 + clamp(7d change, ' + M.growth_floor + ', ' + M.growth_cap + ') / 100 × ' + M.growth_weight + ') × (' + M.maturity_floor + ' + min(age, ' + M.maturity_days + ') / ' + M.maturity_days + ' × ' + M.maturity_range + ') × (1 + min(extra chains × ' + M.chain_per_extra + ', ' + M.chain_cap + ')) )'));
+    $('formula').appendChild(document.createTextNode(' × (1 + clamp(7d change, ' + M.growth_floor + ', ' + M.growth_cap + ') / 100 × ' + M.growth_weight + ') × (' + M.maturity_floor + ' + min(age, ' + M.maturity_days + ') / ' + M.maturity_days + ' × ' + M.maturity_range + ') × min(1 + extra chains × ' + M.chain_per_extra + ', ' + M.chain_cap + ') )'));
     var cats = Array.from(new Set(DATA.rows.map(function (r) { return r.category || 'Other'; }))).sort();
     var sel = $('category');
     sel.appendChild(el('option', { value: 'all', text: 'All categories' }));
