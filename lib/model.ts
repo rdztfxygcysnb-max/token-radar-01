@@ -11,7 +11,9 @@
 // Implied value follows only from the snapshot's own figures, never from a hand-kept list of names:
 //
 //   multiple     = the category's median mcap/TVL over token-bearing peers (see calibrate), clamped
-//                  to [0.05, 1.0]; categories with fewer than 3 peers use the global median instead
+//                  to [0.05, 1.0] and quoted to four decimals, so the board, the dashboard data and
+//                  the page's recomputation all use the identical number; categories with fewer than
+//                  3 peers use the global median instead
 //   growthMult   = 1 + clamp(change_7d, -60, 120) / 100 * 0.5
 //   maturityMult = 0.6 + min(age_days, 1095) / 1095 * 0.4   (age unknown: 365 days)
 //   chainMult    = 1 + 0.02 * min(max(chains - 1, 0), 10)
@@ -243,11 +245,11 @@ export function calibrate(
   for (const category of seen) {
     const peers = byCategory.get(category) ?? [];
     if (peers.length >= MIN_PEERS) {
-      const multiple = clamp(median(peers));
+      const multiple = round4(clamp(median(peers)));
       multiples.set(category, multiple);
-      calibration.push({ category, multiple: round4(multiple), peers: peers.length, fallback: false });
+      calibration.push({ category, multiple, peers: peers.length, fallback: false });
     } else {
-      multiples.set(category, globalMedian);
+      multiples.set(category, round4(globalMedian));
       calibration.push({ category, multiple: round4(globalMedian), peers: peers.length, fallback: true });
     }
   }
